@@ -1,0 +1,45 @@
+name: Update ChatGPT
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-chatgpt
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - name: Check official latest build
+        run: nix develop -c ./scripts/update.sh
+      - name: Sync repository description
+        env:
+          GH_TOKEN: ${{ secrets.REPO_METADATA_TOKEN }}
+        shell: bash
+        run: |
+          version=$(sed -n 's/  version = "\([^"]*\)";/\1/p' sources.nix)
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY" \
+            --raw-field "description=Official ChatGPT desktop app $version packaged for NixOS (auto-updated)"
+      - name: Verify and publish update
+        shell: bash
+        run: |
+          if git diff --quiet -- sources.nix README.md; then
+            echo "Already up to date."
+            exit 0
+          fi
+
+          nix flake check --print-build-logs
+          version=$(sed -n 's/  version = "\([^"]*\)";/\1/p' sources.nix)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md sources.nix flake.lock
+          git commit -m "chore: update ChatGPT to $version"
+          git push
