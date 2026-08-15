@@ -21,7 +21,7 @@ nix run github:csoftware-arigpt/nixos-chatgpt
 Upgrade an existing profile installation:
 
 ```bash
-nix profile upgrade chatgpt
+nix profile upgrade nixos-chatgpt
 ```
 
 ## Why use this repository?
