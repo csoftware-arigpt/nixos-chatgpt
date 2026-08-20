@@ -1,5 +1,5 @@
 {
-  version = "26.818.21641";
+  version = "26.818.22352";
   url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb";
-  hash = "sha256-4Ti46ACPK5AHHhsZ+c7xElxe13EOaP2ch+ZlUoXWj2o=";
+  hash = "sha256-JIFj1oM6FM64WpzD3QnKbcr1nm30dsU+p7PxmkHVRDM=";
 }
