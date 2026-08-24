@@ -4,7 +4,7 @@ An unofficial Nix package for the **official ChatGPT desktop application by
 OpenAI**. The application is downloaded exclusively from OpenAI's official
 [`oaistatic.com` download URL](https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb).
 
-Current packaged version: `26.818.41705`.
+Current packaged version: `26.818.61809`.
 
 ## Install and run with one command
 
