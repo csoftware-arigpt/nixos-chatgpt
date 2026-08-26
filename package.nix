@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  asar,
   fetchurl,
   addDriverRunpath,
   alsa-lib,
@@ -99,6 +100,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoPatchelfHook
+    asar
     dpkg
     makeWrapper
     wrapGAppsHook3
@@ -133,6 +135,22 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p "$out/bin"
     cp -a usr/lib usr/share "$out/"
     ln -s ../lib/chatgpt/codex-launcher "$out/bin/chatgpt"
+
+    # patchelf moves PT_INTERP beyond detect-libc's 2 KiB probe, which makes
+    # @parcel/watcher call process.report.getReport() and trip Electron's CFI.
+    app_asar="$out/lib/chatgpt/resources/app.asar"
+    (
+      cd "$(mktemp -d)"
+      asar extract-file "$app_asar" node_modules/@parcel/watcher/index.js
+      old_hash=$(sha256sum index.js | cut -d ' ' -f 1)
+      sed -i "s/const family = familySync();/const family='glibc'\/\*nix\*\/;/" index.js
+      new_hash=$(sha256sum index.js | cut -d ' ' -f 1)
+      grep -aFq "$old_hash" "$app_asar"
+      sed -i \
+        -e "s/const family = familySync();/const family='glibc'\/\*nix\*\/;/" \
+        -e "s/$old_hash/$new_hash/g" \
+        "$app_asar"
+    )
 
     # The bundled Tectonic has a malformed ELF section table, so patchelf
     # cannot make it runnable on NixOS. Nixpkgs provides the same release.

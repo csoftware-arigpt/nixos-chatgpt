@@ -6,12 +6,17 @@ package=${1:?"$usage"}
 expected_version=${2:?"$usage"}
 expected_tectonic_version=${3:?"$usage"}
 tectonic="$package/lib/chatgpt/resources/plugins/openai-bundled/plugins/latex/bin/tectonic"
+app_asar="$package/lib/chatgpt/resources/app.asar"
 
 test -x "$package/bin/chatgpt"
 test -x "$package/lib/chatgpt/ChatGPT"
 test -x "$tectonic"
 test -f "$package/share/applications/chatgpt.desktop"
 test -f "$package/share/pixmaps/chatgpt.png"
+grep -aFq "const family='glibc'/*nix*/;" "$app_asar"
+if grep -aFq "const family = familySync();" "$app_asar"; then
+  exit 1
+fi
 
 grep -Fqx "Exec=$package/bin/chatgpt %U" \
   "$package/share/applications/chatgpt.desktop"
