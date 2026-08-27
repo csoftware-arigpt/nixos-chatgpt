@@ -44,11 +44,21 @@ cat >"$new_source" <<EOF
 }
 EOF
 
-awk -v version="$version" '
+if cmp --silent "$new_source" "$repository_root/sources.nix"; then
+  updated_at=$(sed -n "s/^Last package update: \`\\(.*\\)\`\\.\$/\\1/p" \
+    "$repository_root/README.md")
+  [[ -n $updated_at ]] || updated_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+else
+  updated_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+fi
+
+awk -v version="$version" -v updated_at="$updated_at" '
   /^Current packaged version:/ {
     print "Current packaged version: `" version "`."
+    print "Last package update: `" updated_at "`."
     next
   }
+  /^Last package update:/ { next }
   { print }
 ' "$repository_root/README.md" >"$new_readme"
 

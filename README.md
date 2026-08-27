@@ -6,7 +6,8 @@ OpenAI**. The application is downloaded exclusively from OpenAI's official
 
 ![ChatGPT desktop application running on NixOS](assets/chatgpt-nixos.png)
 
-Current packaged version: `26.820.60940`.
+Current packaged version: `26.820.71523`.
+Last package update: `2026-08-27T09:03:26Z`.
 
 ## Install and run with one command
 
@@ -24,6 +25,27 @@ Upgrade an existing profile installation:
 
 ```bash
 nix profile upgrade nixos-chatgpt
+```
+
+### Recover from a hash mismatch
+
+The official `latest` URL is mutable. If Nix reports a hash mismatch, do not
+override the hash manually. Update from this repository after its pin changes:
+
+```bash
+git clone https://github.com/csoftware-arigpt/nixos-chatgpt.git
+cd nixos-chatgpt
+git pull --ff-only
+nix flake check
+nix profile upgrade nixos-chatgpt --refresh
+```
+
+If the profile still references an obsolete locked revision, replace it with
+the verified local checkout:
+
+```bash
+nix profile remove nixos-chatgpt
+nix profile add .#chatgpt
 ```
 
 ## Why use this repository?
