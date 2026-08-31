@@ -51,7 +51,7 @@ nix profile add .#chatgpt
 ## Why use this repository?
 
 - **Always current:** GitHub Actions checks OpenAI's official `latest` URL every
-  six hours.
+  hour.
 - **Official application:** the main executable is taken directly from the
   official `.deb` without recompilation. Nix only fixes ELF paths and adds
   desktop integration. The one exception is the malformed bundled Tectonic
@@ -74,7 +74,7 @@ nix profile add .#chatgpt
 `nix develop -c ./scripts/update.sh` downloads the official package, validates
 its Debian `Package`, `Architecture`, and `Version` fields, calculates its
 SHA-256, and updates both `sources.nix` and the version shown in this README.
-The `.github/workflows/update.yml` workflow runs every six hours, synchronizes
+The `.github/workflows/update.yml` workflow runs every hour, synchronizes
 the version in the GitHub repository description, and commits a new pin only
 after a successful build. Description updates use the encrypted
 `REPO_METADATA_TOKEN` Actions secret because GitHub's built-in workflow token
