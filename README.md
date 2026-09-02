@@ -6,8 +6,8 @@ OpenAI**. The application is downloaded exclusively from OpenAI's official
 
 ![ChatGPT desktop application running on NixOS](assets/chatgpt-nixos.png)
 
-Current packaged version: `26.831.20005`.
-Last package update: `2026-09-01T17:50:39Z`.
+Current packaged version: `26.831.21537`.
+Last package update: `2026-09-02T04:39:30Z`.
 
 ## Install and run with one command
 
