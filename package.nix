@@ -10,8 +10,10 @@
   at-spi2-core,
   autoPatchelfHook,
   cairo,
+  coreutils,
   cups,
   dbus,
+  desktop-file-utils,
   dpkg,
   expat,
   fontconfig,
@@ -43,11 +45,17 @@
   systemd,
   tectonic-unwrapped,
   wrapGAppsHook3,
+  writeShellScriptBin,
   xdg-utils,
 }:
 
 let
   source = import ./sources.nix;
+
+  cleanXdgOpen = writeShellScriptBin "xdg-open" ''
+    unset LD_LIBRARY_PATH GIO_EXTRA_MODULES GDK_PIXBUF_MODULE_FILE
+    exec ${xdg-utils}/bin/xdg-open "$@"
+  '';
 
   runtimeLibraries = [
     alsa-lib
@@ -136,6 +144,36 @@ stdenv.mkDerivation (finalAttrs: {
     cp -a usr/lib usr/share "$out/"
     ln -s ../lib/chatgpt/codex-launcher "$out/bin/chatgpt"
 
+    cat > "$out/lib/chatgpt/codex-launcher" <<EOF
+    #!${stdenv.shell}
+    package_share="$out/share"
+    desktop_source="$out/share/applications/chatgpt.desktop"
+    chatgpt="$out/lib/chatgpt/ChatGPT"
+    mkdir_bin="${coreutils}/bin/mkdir"
+    ln_bin="${coreutils}/bin/ln"
+    update_desktop_database="${desktop-file-utils}/bin/update-desktop-database"
+    xdg_mime="${xdg-utils}/bin/xdg-mime"
+    EOF
+    cat >> "$out/lib/chatgpt/codex-launcher" <<'EOF'
+    data_home="''${XDG_DATA_HOME:-''${HOME:+$HOME/.local/share}}"
+    if [ -n "$data_home" ]; then
+      applications="$data_home/applications"
+      desktop_target="$applications/chatgpt.desktop"
+      "$mkdir_bin" -p "$applications" 2>/dev/null
+      if [ -L "$desktop_target" ]; then
+        "$ln_bin" -sfn "$desktop_source" "$desktop_target"
+      elif [ ! -e "$desktop_target" ]; then
+        "$ln_bin" -s "$desktop_source" "$desktop_target"
+      fi
+      "$update_desktop_database" "$applications" >/dev/null 2>&1 || true
+      XDG_DATA_DIRS="$package_share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}" \
+        "$xdg_mime" default chatgpt.desktop x-scheme-handler/codex \
+        >/dev/null 2>&1 || true
+    fi
+    exec "$chatgpt" "$@"
+    EOF
+    chmod +x "$out/lib/chatgpt/codex-launcher"
+
     # patchelf moves PT_INTERP beyond detect-libc's 2 KiB probe, which makes
     # @parcel/watcher call process.report.getReport() and trip Electron's CFI.
     app_asar="$out/lib/chatgpt/resources/app.asar"
@@ -168,7 +206,12 @@ stdenv.mkDerivation (finalAttrs: {
     wrapProgram "$out/lib/chatgpt/ChatGPT" \
       "''${gappsWrapperArgs[@]}" \
       --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath runtimeLibraries}:${addDriverRunpath.driverLink}/lib" \
-      --prefix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
+      --prefix PATH : "${
+        lib.makeBinPath [
+          cleanXdgOpen
+          xdg-utils
+        ]
+      }" \
       --prefix XDG_DATA_DIRS : "${addDriverRunpath.driverLink}/share"
   '';
 

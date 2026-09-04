@@ -13,6 +13,7 @@ test -x "$package/lib/chatgpt/ChatGPT"
 test -x "$tectonic"
 test -f "$package/share/applications/chatgpt.desktop"
 test -f "$package/share/pixmaps/chatgpt.png"
+grep -aFq -- '-xdg-open/bin' "$package/lib/chatgpt/ChatGPT"
 grep -aFq "const family='glibc'/*nix*/;" "$app_asar"
 if grep -aFq "const family = familySync();" "$app_asar"; then
   exit 1
@@ -30,5 +31,10 @@ for binary in \
   patchelf --print-rpath "$binary" | grep -q /nix/store/
 done
 
-[[ $("$package/bin/chatgpt" --version) == "$expected_version" ]]
+test_home=$(mktemp -d)
+[[ $(HOME="$test_home" XDG_DATA_HOME="$test_home/share" \
+  "$package/bin/chatgpt" --version) == "$expected_version" ]]
+test -L "$test_home/share/applications/chatgpt.desktop"
+grep -Fq 'x-scheme-handler/codex=chatgpt.desktop;' \
+  "$test_home/share/applications/mimeinfo.cache"
 [[ $("$tectonic" --version) == "Tectonic $expected_tectonic_version" ]]

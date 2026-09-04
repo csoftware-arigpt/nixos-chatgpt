@@ -63,6 +63,9 @@ nix profile add .#chatgpt
   `nix flake check` passes its launcher, desktop file, ELF interpreter, and
   LaTeX helper smoke tests.
 - **Native Nix package:** no `nix-ld`, `steam-run`, or FHS container is required.
+- **Working external links:** Nix-specific library variables are removed before
+  launching the system browser, and `codex://` callbacks are registered in the
+  user's desktop MIME database.
 
 ## Supported platform
 
