@@ -192,9 +192,9 @@ stdenv.mkDerivation (finalAttrs: {
 
     # The bundled Tectonic has a malformed ELF section table, so patchelf
     # cannot make it runnable on NixOS. Nixpkgs provides the same release.
-    rm "$out/lib/chatgpt/resources/plugins/openai-bundled/plugins/latex/bin/tectonic"
+    rm "$out/lib/chatgpt/resources/tectonic/tectonic"
     ln -s "${tectonic-unwrapped}/bin/tectonic" \
-      "$out/lib/chatgpt/resources/plugins/openai-bundled/plugins/latex/bin/tectonic"
+      "$out/lib/chatgpt/resources/tectonic/tectonic"
 
     substituteInPlace "$out/share/applications/chatgpt.desktop" \
       --replace-fail "Exec=chatgpt %U" "Exec=$out/bin/chatgpt %U"

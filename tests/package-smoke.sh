@@ -5,7 +5,7 @@ usage="usage: package-smoke.sh PACKAGE_PATH EXPECTED_VERSION EXPECTED_TECTONIC_V
 package=${1:?"$usage"}
 expected_version=${2:?"$usage"}
 expected_tectonic_version=${3:?"$usage"}
-tectonic="$package/lib/chatgpt/resources/plugins/openai-bundled/plugins/latex/bin/tectonic"
+tectonic="$package/lib/chatgpt/resources/tectonic/tectonic"
 app_asar="$package/lib/chatgpt/resources/app.asar"
 
 test -x "$package/bin/chatgpt"
