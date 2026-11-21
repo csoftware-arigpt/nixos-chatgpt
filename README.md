@@ -6,8 +6,8 @@ OpenAI**. The application is downloaded exclusively from OpenAI's official
 
 ![ChatGPT desktop application running on NixOS](assets/chatgpt-nixos.png)
 
-Current packaged version: `26.1111.71704`.
-Last package update: `2026-11-19T03:32:57Z`.
+Current packaged version: `26.1117.41037`.
+Last package update: `2026-11-21T06:20:27Z`.
 
 ## Install and run with one command
 
@@ -54,8 +54,8 @@ nix profile add .#chatgpt
   hour.
 - **Official application:** the main executable is taken directly from the
   official `.deb` without recompilation. Nix only fixes ELF paths and adds
-  desktop integration. The one exception is the malformed bundled Tectonic
-  helper, which is replaced with the same release from Nixpkgs so that LaTeX
+  desktop integration. The one exception is Tectonic, which upstream stopped
+  bundling; the package links the same release from Nixpkgs so that LaTeX
   features work on a clean NixOS system.
 - **Reproducible:** the exact version and SHA-256 are pinned in `sources.nix`, so
   the mutable `latest` URL cannot silently change an installation.

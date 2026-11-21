@@ -6,11 +6,13 @@ package=${1:?"$usage"}
 expected_version=${2:?"$usage"}
 expected_tectonic_version=${3:?"$usage"}
 tectonic="$package/lib/chatgpt/resources/tectonic/tectonic"
+tectonic_bin="$package/lib/chatgpt/resources/tectonic/bin/tectonic"
 app_asar="$package/lib/chatgpt/resources/app.asar"
 
 test -x "$package/bin/chatgpt"
 test -x "$package/lib/chatgpt/ChatGPT"
 test -x "$tectonic"
+test -x "$tectonic_bin"
 test -f "$package/share/applications/chatgpt.desktop"
 test -f "$package/share/pixmaps/chatgpt.png"
 grep -aFq -- '-xdg-open/bin' "$package/lib/chatgpt/ChatGPT"

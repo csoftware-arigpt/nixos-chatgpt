@@ -190,11 +190,15 @@ stdenv.mkDerivation (finalAttrs: {
         "$app_asar"
     )
 
-    # The bundled Tectonic has a malformed ELF section table, so patchelf
-    # cannot make it runnable on NixOS. Nixpkgs provides the same release.
-    rm "$out/lib/chatgpt/resources/tectonic/tectonic"
-    ln -s "${tectonic-unwrapped}/bin/tectonic" \
-      "$out/lib/chatgpt/resources/tectonic/tectonic"
+    # Upstream stopped shipping Tectonic in 26.1117.41037, and the bundled copy
+    # it shipped before had a malformed ELF section table that patchelf cannot
+    # fix. Nixpkgs provides the same release, so always link it where the app
+    # and the LaTeX plugin look for it.
+    tectonic_dir="$out/lib/chatgpt/resources/tectonic"
+    mkdir -p "$tectonic_dir/bin"
+    rm -f "$tectonic_dir/tectonic" "$tectonic_dir/bin/tectonic"
+    ln -s "${tectonic-unwrapped}/bin/tectonic" "$tectonic_dir/tectonic"
+    ln -s "${tectonic-unwrapped}/bin/tectonic" "$tectonic_dir/bin/tectonic"
 
     substituteInPlace "$out/share/applications/chatgpt.desktop" \
       --replace-fail "Exec=chatgpt %U" "Exec=$out/bin/chatgpt %U"
@@ -209,6 +213,7 @@ stdenv.mkDerivation (finalAttrs: {
       --prefix PATH : "${
         lib.makeBinPath [
           cleanXdgOpen
+          tectonic-unwrapped
           xdg-utils
         ]
       }" \
